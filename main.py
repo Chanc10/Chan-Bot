@@ -16,7 +16,7 @@ from discord.ext import commands
 
 load_dotenv()
 
-intents = discord.Intents().default()
+intents = discord.Intents().all()
 intents.members = True
 
 bot = commands.Bot(command_prefix='/', intents=intents, case_insensitive=True)
