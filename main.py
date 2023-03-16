@@ -2,7 +2,7 @@
 Chan Bot
 Created by chan#2747 on Discord
 3/9/23
-!Current functions: /joke /history /astronomy /pet /doom
+!Current functions: /joke /history /astronomy /pet /doom /compliment /bonk
 """
 
 import os
