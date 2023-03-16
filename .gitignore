@@ -1,3 +1,4 @@
 *.env
 Procfile
 token.txt
+winston_pics/

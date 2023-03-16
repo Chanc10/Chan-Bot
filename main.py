@@ -25,6 +25,9 @@ bot = commands.Bot(command_prefix='/', intents=intents, case_insensitive=True)
 async def on_ready():
     print('Bot is ready')
 
+
+
+
 @bot.command(name='joke')
 async def joke(ctx):
     joke = get_joke()
@@ -63,6 +66,24 @@ async def astronomy(ctx):
     # Send the image and explanation to the channel
     await ctx.send(data['url'])
     await ctx.send(data['explanation'])
+
+@bot.command(name='pet')
+async def pet(ctx):
+    # Define the path to the directory containing Winston pictures
+    pet_dir = './winston_pics'
+
+    # Get a list of all files in the directory
+    pics = os.listdir(pet_dir)
+
+    # Choose a random picture from the list
+    chosen_pic = random.choice(pics)
+
+    # Create a file object for the chosen picture
+    with open(os.path.join(pet_dir, chosen_pic), 'rb') as f:
+        pic_file = discord.File(f)
+
+    # Send the picture to the channel
+    await ctx.send(file=pic_file)
 
 # Function to fetch a random joke from the API
 def get_joke():
