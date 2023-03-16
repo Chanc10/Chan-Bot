@@ -11,8 +11,10 @@ import requests
 import json
 import datetime
 import random
+import time
 from dotenv import load_dotenv
 from discord.ext import commands
+from PIL import Image
 
 load_dotenv()
 
@@ -20,10 +22,48 @@ intents = discord.Intents().all()
 intents.members = True
 
 bot = commands.Bot(command_prefix='/', intents=intents, case_insensitive=True)
+bot.last_compliment = {}
+
+COMPLIMENT_COOLDOWN = 7200  # 2 hours in seconds
+COMPLIMENTS = [
+    "You are amazing!",
+    "You're doing great, keep going :)",
+    "You make this community a better place!",
+    "You always make my day brighter!",
+    "You are a blessing to those around you!",
+]
 
 @bot.event
 async def on_ready():
     print('Bot is ready')
+
+@bot.command(name='bonk')
+async def bonk(ctx, member: discord.Member):
+    # Send a message in the channel to indicate who was bonked
+    await ctx.send(f'{member.mention}, you have been bonked by {ctx.author.mention}!', file=discord.File('./bonk-doge.gif'))
+
+@bot.command(name='compliment')
+async def compliment(ctx, *, message=None):
+    last_used = bot.last_compliment.get(ctx.author.id, 0)
+    current_time = time.time()
+
+    if current_time - last_used < COMPLIMENT_COOLDOWN:
+        time_left = COMPLIMENT_COOLDOWN - int(current_time - last_used)
+        await ctx.send(f"Sorry, you can only use this command once every 2 hours. Try again in {time_left // 60} minutes.")
+        return
+
+    members = ctx.guild.members
+    # Filter out bots and the command user
+    members = [member for member in members if not member.bot and member != ctx.author]
+    if len(members) == 0:
+        await ctx.send("Sorry, I couldn't find any users to compliment!")
+        return
+    # Pick a random user from the list of members
+    target_user = random.choice(members)
+    compliment = f"{target_user.mention}, {message or random.choice(COMPLIMENTS)}"
+    await ctx.send(compliment)
+
+    bot.last_compliment[ctx.author.id] = current_time
 
 @bot.command(name='joke')
 async def joke(ctx):
@@ -72,6 +112,15 @@ async def pet(ctx):
 
     # Choose a random picture from the list
     chosen_pic = random.choice(pics)
+
+    # Compress the image if it is larger than 8MB
+    file_size = os.path.getsize(os.path.join(pet_dir, chosen_pic))
+    while file_size > 8000000:
+        with Image.open(os.path.join(pet_dir, chosen_pic)) as im:
+            im = im.convert('RGB')
+            im = im.resize((int(im.width * 0.9), int(im.height * 0.9)), resample=Image.LANCZOS)
+            im.save(os.path.join(pet_dir, chosen_pic), optimize=True, quality=85)
+        file_size = os.path.getsize(os.path.join(pet_dir, chosen_pic))
 
     # Create a file object for the chosen picture
     with open(os.path.join(pet_dir, chosen_pic), 'rb') as f:
