@@ -2,7 +2,7 @@
 Chan Bot
 Created by chan#2747 on Discord
 3/9/23
-!Current functions: /joke /history /astronomy
+!Current functions: /joke /history /astronomy /pet /doom
 """
 
 import os
@@ -25,9 +25,6 @@ bot = commands.Bot(command_prefix='/', intents=intents, case_insensitive=True)
 async def on_ready():
     print('Bot is ready')
 
-
-
-
 @bot.command(name='joke')
 async def joke(ctx):
     joke = get_joke()
@@ -39,18 +36,16 @@ async def history(ctx):
     now = datetime.datetime.now()
     today = now.strftime("%m/%d")
 
-    # Check if the date has been fetched before, if not fetch a new fact
-    if today not in bot.facts:
-        try:
-            fact = get_history_fact(today)
-            bot.facts.add(today)
-        except:
-            fact = "Sorry, I couldn't fetch a fact for today."
-    else:
-        fact = "Sorry, I've already shared a fact for today."
-
+    # Fetch a random fact for the current day
+    url = f"http://numbersapi.com/{today}/date"
+    response = requests.get(url)
+    
     # Send the fact to the channel
-    await ctx.send(f"On this day in history: {fact}")
+    if response.ok:
+        fact = response.text
+        await ctx.send(f"On this day in history: {fact}")
+    else:
+        await ctx.send("Sorry, I couldn't fetch a fact for today.")
 
 @bot.command(name='astronomy')
 async def astronomy(ctx):
@@ -69,7 +64,7 @@ async def astronomy(ctx):
 
 @bot.command(name='pet')
 async def pet(ctx):
-    # Define the path to the directory containing Winston pictures
+    # Define the path to the directory containing Winston/Hazel pictures
     pet_dir = './winston_pics'
 
     # Get a list of all files in the directory
@@ -85,6 +80,20 @@ async def pet(ctx):
     # Send the picture to the channel
     await ctx.send(file=pic_file)
 
+@bot.command(name='doom')
+async def doom(ctx):
+    # Make a request to the Giphy API to get a random image of MF DOOM
+    url = "https://api.giphy.com/v1/gifs/random"
+    params = {
+        "api_key": os.environ['GIPHY_API_KEY'],
+        "tag": "MF DOOM"
+    }
+    response = requests.request("GET", url, params=params)
+    data = json.loads(response.text)
+
+    # Send the image to the channel
+    await ctx.send(data['data']['images']['original']['url'])
+
 # Function to fetch a random joke from the API
 def get_joke():
     url = "https://official-joke-api.appspot.com/random_joke"
@@ -93,17 +102,14 @@ def get_joke():
     joke = f"{joke_json['setup']} {joke_json['punchline']}"
     return joke
 
-# Function to fetch a random historical fact based on the given date
+# Fetch a fact related to the specified date using the Numbers API
 def get_history_fact(date):
-    url = f"https://history.muffinlabs.com/date/{date}"
-    response = requests.request("GET", url)
-    data = json.loads(response.text)
-
-    # Get a random event from the list of events for the given date
-    events = data['data']['Events']
-    fact = random.choice(events)['text']
-
-    return fact
+    url = f"http://numbersapi.com/{date}/date"
+    response = requests.get(url)
+    if response.ok:
+        return response.text
+    else:
+        return "Sorry, I couldn't fetch a fact for this date."
 
 # Set up a set to store the facts that have been fetched
 bot.facts = set()
