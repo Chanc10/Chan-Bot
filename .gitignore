@@ -2,3 +2,5 @@
 Procfile
 token.txt
 winston_pics/
+bot.log
+requirements.txt

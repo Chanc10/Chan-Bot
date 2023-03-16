@@ -12,11 +12,15 @@ import json
 import datetime
 import random
 import time
+import logging
 from dotenv import load_dotenv
 from discord.ext import commands
 from PIL import Image
 
 load_dotenv()
+
+# configure logging
+logging.basicConfig(filename='bot.log', level=logging.INFO, format='%(asctime)s %(levelname)s: %(message)s')
 
 intents = discord.Intents().all()
 intents.members = True
@@ -35,15 +39,18 @@ COMPLIMENTS = [
 
 @bot.event
 async def on_ready():
+    logging.info('Bot is ready')
     print('Bot is ready')
 
 @bot.command(name='bonk')
 async def bonk(ctx, member: discord.Member):
+    logging.info(f"{ctx.author} used the /bonk command")
     # Send a message in the channel to indicate who was bonked
     await ctx.send(f'{member.mention}, you have been bonked by {ctx.author.mention}!', file=discord.File('./bonk-doge.gif'))
 
 @bot.command(name='compliment')
 async def compliment(ctx, *, message=None):
+    logging.info(f"{ctx.author} used the /compliment command")
     last_used = bot.last_compliment.get(ctx.author.id, 0)
     current_time = time.time()
 
@@ -67,11 +74,13 @@ async def compliment(ctx, *, message=None):
 
 @bot.command(name='joke')
 async def joke(ctx):
+    logging.info(f"{ctx.author} used the /joke command")
     joke = get_joke()
     await ctx.send(joke)
 
 @bot.command(name='history')
 async def history(ctx):
+    logging.info(f"{ctx.author} used the /history command")
     # Get the current date and format it as 'month/day'
     now = datetime.datetime.now()
     today = now.strftime("%m/%d")
@@ -89,6 +98,7 @@ async def history(ctx):
 
 @bot.command(name='astronomy')
 async def astronomy(ctx):
+    logging.info(f"{ctx.author} used the /astronomy command")
     # Get today's date
     now = datetime.datetime.now()
     date = now.strftime("%Y-%m-%d")
@@ -104,6 +114,7 @@ async def astronomy(ctx):
 
 @bot.command(name='pet')
 async def pet(ctx):
+    logging.info(f"{ctx.author} used the /pet command")
     # Define the path to the directory containing Winston/Hazel pictures
     pet_dir = './winston_pics'
 
@@ -131,6 +142,7 @@ async def pet(ctx):
 
 @bot.command(name='doom')
 async def doom(ctx):
+    logging.info(f"{ctx.author} used the /doom command")
     # Make a request to the Giphy API to get a random image of MF DOOM
     url = "https://api.giphy.com/v1/gifs/random"
     params = {
