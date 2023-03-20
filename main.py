@@ -28,7 +28,7 @@ intents.members = True
 bot = commands.Bot(command_prefix='/', intents=intents, case_insensitive=True)
 bot.last_compliment = {}
 
-COMPLIMENT_COOLDOWN = 7200  # 2 hours in seconds
+COMPLIMENT_COOLDOWN = 3600  # 1 hour in seconds
 COMPLIMENTS = [
     "You are amazing!",
     "You're doing great, keep going :)",
