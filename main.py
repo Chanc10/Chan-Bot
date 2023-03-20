@@ -56,7 +56,7 @@ async def compliment(ctx, *, message=None):
 
     if current_time - last_used < COMPLIMENT_COOLDOWN:
         time_left = COMPLIMENT_COOLDOWN - int(current_time - last_used)
-        await ctx.send(f"Sorry, you can only use this command once every 2 hours. Try again in {time_left // 60} minutes.")
+        await ctx.send(f"Sorry, you can only use this command once every hour. Try again in {time_left // 60} minutes.")
         return
 
     members = ctx.guild.members
