@@ -1,4 +1,0 @@
-Chan Bot Functions:
-/joke - tells a random joke
-/history - tells a random "On this day in history" fact
-/astronomy - displays the pic of the day from NASA website
